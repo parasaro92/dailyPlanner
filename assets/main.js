@@ -4,6 +4,43 @@ $(document).ready(function(){
     addTask(e);
   });
 
+  displayTasks();
+  
+  //Function to display tasks
+  function displayTasks() {
+
+    var taskList = JSON.parse(localStorage.getItem('tasks'));
+
+    // Sort task
+    if(taskList !== null){
+      taskList = taskList.sort(sortByTime); 
+    }
+
+    var i = 0;
+    // Check tasks
+    if(localStorage.getItem('tasks') !== null){
+
+      // iterate through and display it
+      $.each(taskList, function(key, value){
+        $('#task-table').append('<tr id="' + value.id + '">' +
+                                '<td>' + value.task + '</td>' +
+                                '<td>' + value.task_priority + '</td>' +
+                                '<td>' + value.task_date + '</td>' +
+                                '<td>' + value.task_time + '</td>' + 
+                                '<td><a href="edit.html?id=' + value.id + '">Edit</a> | <a href="#" id="remove-task">Remove</a></td>' + 
+                                '</tr>');
+      })
+    }  
+  }
+
+  // function to sort task
+  function sortByTime(a, b){
+
+    var aTime = a.task_time;
+    var bTime = b.task_time;
+    return ((aTime < bTime) ? -1 : ((aTime > bTime) ? 1 : 0));
+  }
+
   function addTask(e){
 
     var newDate = new Date();
@@ -35,7 +72,7 @@ $(document).ready(function(){
         tasks = [];
      }
 
-      var task_list = JSON.parse(localStorage.getItem('tasks'));
+      var taskList = JSON.parse(localStorage.getItem('tasks'));
 
       var new_task = {
         "id": id,
