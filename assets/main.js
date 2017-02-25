@@ -8,6 +8,17 @@ $(document).ready(function(){
     updateTask(e);
   });
 
+  // Remove Task
+  $('#task-table').on('click', '#remove-task', function(){
+    id = $(this).data('id');
+    removeTask(id);
+  });
+
+  // Clear Task
+  $('#clear-tasks').on('click', function(){
+    clearAllTasks();
+  });
+
   displayTasks();
   
   //Function to display tasks
@@ -31,7 +42,7 @@ $(document).ready(function(){
                                 '<td>' + value.task_priority + '</td>' +
                                 '<td>' + value.task_date + '</td>' +
                                 '<td>' + value.task_time + '</td>' + 
-                                '<td><a href="edit.html?id=' + value.id + '">Edit</a> | <a href="#" id="remove-task">Remove</a></td>' + 
+                                '<td><a href="edit.html?id=' + value.id + '">Edit</a> | <a href="#" id="remove-task" data-id="'+ value.id +'">Remove</a></td>' + 
                                 '</tr>');
       })
     }  
@@ -149,40 +160,68 @@ $(document).ready(function(){
       console.log("task add!");
     }
   }
-});
 
-  // GET single task
-  function getTask(){
+  //Remove Task
+  function removeTask(id){
 
-    var $_GET = getQueryParams(document.location.search);
-    id = $_GET['id'];
+    if(confirm("Are you sure you want to delete this task?")){
+      var taskList = JSON.parse(localStorage.getItem('tasks'));
 
-    var taskList = JSON.parse(localStorage.getItem('tasks'));
+      for(var i=0; i < taskList.length; i++){
 
-    for(var i=0; i < taskList.length; i++){
+        if(taskList[i].id == id) {
 
-      if(taskList[i].id == id){
-        $('#edit-task-form #task_id').val(taskList[i].id);
-        $('#edit-task-form #task').val(taskList[i].task);
-        $('#edit-task-form #priority').val(taskList[i].task_priority);
-        $('#edit-task-form #date').val(taskList[i].task_date);
-        $('#edit-task-form #time').val(taskList[i].task_time);
+          taskList.splice(i,1);
+        }
+        localStorage.setItem('tasks', JSON.stringify(taskList));
       }
     }
-  } 
 
-  // GET HTTP GET request
-  function getQueryParams(qs){
-
-    qs = qs.split("+").join(" ");
-    var params = {},
-        tokens,
-        re = /[?&]?([^=]+)=([^&]*)/g;
-
-    while(tokens = re.exec(qs)){
-      params[decodeURIComponent(tokens[1])]
-        = decodeURIComponent(tokens[2]);
-    }
-
-    return params;
+    location.reload();
   }
+
+  function clearAllTasks(){
+
+    if(confirm("Do you want to clear all tasks")){
+
+      localStorage.clear();
+      location.reload();
+    }
+  }
+});
+
+// GET single task
+function getTask(){
+
+  var $_GET = getQueryParams(document.location.search);
+  id = $_GET['id'];
+
+  var taskList = JSON.parse(localStorage.getItem('tasks'));
+
+  for(var i=0; i < taskList.length; i++){
+
+    if(taskList[i].id == id){
+      $('#edit-task-form #task_id').val(taskList[i].id);
+      $('#edit-task-form #task').val(taskList[i].task);
+      $('#edit-task-form #priority').val(taskList[i].task_priority);
+      $('#edit-task-form #date').val(taskList[i].task_date);
+      $('#edit-task-form #time').val(taskList[i].task_time);
+    }
+  }
+} 
+
+// GET HTTP GET request
+function getQueryParams(qs){
+
+  qs = qs.split("+").join(" ");
+  var params = {},
+      tokens,
+      re = /[?&]?([^=]+)=([^&]*)/g;
+
+  while(tokens = re.exec(qs)){
+    params[decodeURIComponent(tokens[1])]
+      = decodeURIComponent(tokens[2]);
+  }
+
+  return params;
+}
